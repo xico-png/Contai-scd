@@ -10,14 +10,14 @@ export const getTransactions = async (_req: Request, res: Response) => {
 };
 
 export const createTransaction = async (req: Request, res: Response): Promise<any> => {
-  const { amount, date, type } = req.body;
+  const { amount, description ,date, type } = req.body;
 
-  if (!amount || !date || !type) {
+  if (!amount || !date || !type || !description) {
     return res.status(400).json({ error: 'Campos obrigatórios ausentes' });
   }
 
   try {
-    const transaction = transactionRepo.create({ amount, date, type });
+    const transaction = transactionRepo.create({ amount, description,date, type });
     await transactionRepo.save(transaction);
     return res.status(201).json(transaction); // ✅ COM return
   } catch (err) {
