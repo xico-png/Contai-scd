@@ -1,6 +1,6 @@
 import type { Transaction } from '../types/transaction';
 
-const API_URL = 'http://localhost:3000/api/transactions'; // ajuste para seu backend
+const API_URL = 'http://localhost:3000/api/transactions'; // ajuste para seu backend // normalmente .env
 
 export async function fetchTransactions(): Promise<Transaction[]> {
   const response = await fetch(API_URL);

@@ -1,37 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { Transaction } from '../types/transaction';
-import { fetchTransactions, createTransaction } from '../api/transactions';
 import TransactionForm from '../components/transactionForm';
 import './styles/global.css';
-
-const groupTransactions = (
-  transactions: Transaction[]
-): [string, [string, Transaction[]][]][] => {
-  const yearGroups: { [year: string]: { [month: string]: Transaction[] } } = {};
-
-  transactions.forEach((tx) => {
-    const date = new Date(tx.date);
-    const year = date.getFullYear().toString();
-    const month = date.getMonth().toString();
-
-    if (!yearGroups[year]) yearGroups[year] = {};
-    if (!yearGroups[year][month]) yearGroups[year][month] = [];
-    yearGroups[year][month].push(tx);
-  });
-
-  return Object.entries(yearGroups)
-    .sort((a, b) => b[0].localeCompare(a[0]))
-    .map(([year, months]) => [
-      year,
-      Object.entries(months).sort((a, b) => Number(b[0]) - Number(a[0])),
-    ]);
-};
-
-const formatMonthYear = (key: string) => {
-  const [year, month] = key.split('-').map(Number);
-  const date = new Date(year, month);
-  return date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' });
-};
+import { formatMonthYear } from '../utils/formatters';
+import { createTransaction, fetchTransactions } from '../services/transactionsService';
 
 const Home: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -47,6 +19,29 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error('Erro ao salvar transação:', error);
     }
+  };
+
+  const groupTransactions = (
+    transactions: Transaction[]
+  ): [string, [string, Transaction[]][]][] => {
+    const yearGroups: { [year: string]: { [month: string]: Transaction[] } } = {};
+  
+    transactions.forEach((tx) => {
+      const date = new Date(tx.date);
+      const year = date.getFullYear().toString();
+      const month = date.getMonth().toString();
+  
+      if (!yearGroups[year]) yearGroups[year] = {};
+      if (!yearGroups[year][month]) yearGroups[year][month] = [];
+      yearGroups[year][month].push(tx);
+    });
+  
+    return Object.entries(yearGroups)
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([year, months]) => [
+        year,
+        Object.entries(months).sort((a, b) => Number(b[0]) - Number(a[0])),
+      ]);
   };
 
   const grouped = groupTransactions(transactions);
